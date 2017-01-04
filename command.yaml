@@ -1,3 +1,10 @@
+#fichier de définition d'une série d'instructions à executer
+#elles seront retriées par ordre chronologique par le robot (tri en place)
+#format : "date device value"
+#date : int, en ms
+#device :  string {motor, vitesse, direction} cf servo/servo.yaml
+#value : float, bornes dépendant du device, cf servo/servo.yaml
+
 {chrono_command:[
 "500 direction 0",
 "1000 motor 5",
