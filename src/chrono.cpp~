@@ -64,7 +64,7 @@ void launchCommand(const ros::TimerEvent& tevent )
     cmd = commandList.back();
     servoCommand.device = cmd.device;
     servoCommand.value = cmd.value;
-    ROS_INFO("%d : executed (%s,%f) planned at time %d ", (int) (MILLIS * (tevent.current_real - tstart).toSec()), cmd.device.c_str(), cmd.value, (int)cmd.time);
+    ROS_INFO("%i : executed (%s,%f) planned at time %d ", (int) (MILLIS * (tevent.current_real - tstart).toSec()), cmd.device.c_str(), cmd.value, cmd.time);
     command_pub.publish(servoCommand);
     commandList.pop_back();
     if(commandList.empty())
