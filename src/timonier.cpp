@@ -13,23 +13,114 @@ using std::reverse;
 
 ros::Publisher command_pub;
 vector<Command*> commandList;
+vector<Command*> sentCommandList;
 ros::Time tstart;
 Command* currentCommand;
 Command* previousCommand;
 Command* askedCommand;
+Command* lastSentCommand;
+
+bool isReversing;
+
+void launchCommand(const ros::TimerEvent&){
+	if(isReversing==true)return;
+	else{
+		qg::servo_command motorCommand;
+		motorCommand.device = "motor";
+		qg::servo_command gearCommand;
+		gearCommand.device = "vitesse";
+		gearCommand.value = 2;
+		qg::servo_command directionCommand;
+		directionCommand.device = "direction";
+		
+		float Vprecedent = lastSentCommand->value;
+		float Vcible = currentCommand->value;
+		
+		double Vincrement = std::min((double)std::abs(Vprecedent-Vcible), 5.0);
+		
+		if(Vprecedent > Vcible){
+			motorCommand.value-= Vincrement;
+		}
+		else{
+			motorCommand.value+= Vincrement;
+		}
+		
+		
+		float Dprecedent = lastSentCommand->angle;
+		float Dcible = currentCommand->angle;
+		
+		double Dincrement = std::min((double)std::abs(Dprecedent-Dcible), 10.0);
+		
+		if(Dprecedent > Dcible){
+			directionCommand.value-= Dincrement;
+		}
+		else{
+			directionCommand.value+= Dincrement;
+		}
+		
+		command_pub.publish(motorCommand);
+		command_pub.publish(directionCommand);
+		command_pub.publish(gearCommand);
+		
+		lastSentCommand->value = motorCommand.value;
+		lastSentCommand->angle = directionCommand.value;
+		lastSentCommand->stamp = ros::Time::now();
+	}
+
+}
+
+void reverse(){
+	qg::servo_command servoCommand;
+	
+	ROS_INFO("warning : reversing!");
+	
+	servoCommand.device = "motor";
+	
+	servoCommand.value = 0;
+  command_pub.publish(servoCommand);
+  ros::Duration(0.1).sleep();
+  servoCommand.value = -11.40;
+  command_pub.publish(servoCommand);
+  ros::Duration(0.1).sleep();
+  servoCommand.value = -11.45;
+  command_pub.publish(servoCommand);
+  ros::Duration(0.5).sleep();
+  servoCommand.value = -11.5;
+  command_pub.publish(servoCommand);
+  ros::Duration(0.1).sleep();
+  
+  ROS_INFO("warning : reserving done !");
+  
+  lastSentCommand->value = -11.5;
+  lastSentCommand->stamp = ros::Time::now();
+}
+
 
 void enAvantToute(const qg::ordreAmiral::ConstPtr& msg)
 {
+	if(isReversing==true)return;
+	
 	commandList.push_back(new Command(previousCommand->stamp,previousCommand->value,previousCommand->angle ));
 	previousCommand = currentCommand;
 	askedCommand = new Command(msg->header.stamp, msg->vitesse , msg->direction);
+	
+	if ((lastSentCommand->value)*(askedCommand->value)>=0){
+		currentCommand = askedCommand;
+	}
+	else{
+		if(askedCommand->value > 0){
+			currentCommand = askedCommand;
+		}
+		else{
+			isReversing=true;
+			reverse();
+			isReversing=false;
+			currentCommand = askedCommand;			
+		}
+	}
 }
 
 
-void launchCommand(const ros::TimerEvent&){
-
-
-}
 
 
 
@@ -43,6 +134,7 @@ int main(int argc, char **argv)
   
   ros::Subscriber ordre = n.subscribe("ordreDeLAmiral", 1000, enAvantToute);
   
+  isReversing=false;
   
   ros::Rate loop_rate(10);
 
