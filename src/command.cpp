@@ -1,3 +1,4 @@
+#include "ros/ros.h"
 #include "command.h"
 
 
@@ -16,8 +17,8 @@ Command::Command(int gtime, string gdevice, float gvalue){
   this->value = gvalue;
 }
 
-Command::Command(int gtime, float gvalue, float gangle){
-  this->time = gtime;
+Command::Command(ros::Time gstamp, float gvalue, float gangle){
+  this->stamp = gstamp;
   this->value = gvalue;
   this->angle = gangle;
 }

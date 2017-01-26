@@ -2,6 +2,7 @@
 #include <string>
 #include <cstdlib>
 
+
 using std::vector;
 using std::string;
 
@@ -9,6 +10,7 @@ class Command
 {
   public:
   int time;
+  ros::Time stamp;
   string device;
   float value;
   float angle;
@@ -19,7 +21,7 @@ class Command
   public:
   Command();
   Command(int gtime, string gdevice, float gvalue);
-  Command(int gtime, float gvalue, float gangle);
+  Command(ros::Time gstamp, float gvalue, float gangle);
   Command(std::string command);
   
   bool operator<(Command const & b);

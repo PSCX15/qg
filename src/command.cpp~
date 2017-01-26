@@ -16,9 +16,8 @@ Command::Command(int gtime, string gdevice, float gvalue){
   this->value = gvalue;
 }
 
-Command::Command(int gtime, string gdevice, float gvalue, float gangle){
-  this->time = gtime;
-  this->device = gdevice;
+Command::Command(ros::Time gstamp, float gvalue, float gangle){
+  this->stamp = gstamp;
   this->value = gvalue;
   this->angle = gangle;
 }
