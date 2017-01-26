@@ -19,7 +19,7 @@ class Command
   public:
   Command();
   Command(int gtime, string gdevice, float gvalue);
-  Command(int gtime, float gvalue, float gangle);
+  Command(int gtime, string gdevice, float gvalue, float gangle);
   Command(std::string command);
   
   bool operator<(Command const & b);

@@ -1,4 +1,3 @@
-
 #include "ros/ros.h"
 #include <algorithm>
 #include "command.h"
@@ -38,7 +37,7 @@ int main(int argc, char **argv)
   std::sort(commandList.begin(), commandList.end());
   std::reverse(commandList.begin(), commandList.end());
   
-  ROS_INFO("chrono: got %d commands", commandList.size());
+  ROS_INFO("chrono: got %lu commands", commandList.size());
 
   //définition du timer
   tstart = ros::Time::now();

@@ -16,8 +16,9 @@ Command::Command(int gtime, string gdevice, float gvalue){
   this->value = gvalue;
 }
 
-Command::Command(int gtime, float gvalue, float gangle){
+Command::Command(int gtime, string gdevice, float gvalue, float gangle){
   this->time = gtime;
+  this->device = gdevice;
   this->value = gvalue;
   this->angle = gangle;
 }

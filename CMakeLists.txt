@@ -49,6 +49,7 @@ find_package(catkin REQUIRED COMPONENTS
  add_message_files(
    FILES
    servo_command.msg
+   ordreAmiral.msg
  )
 
 ## Generate services in the 'srv' folder
@@ -141,6 +142,16 @@ include_directories(
    ${catkin_LIBRARIES}
  )
 
+ add_executable(timonier src/timonier.cpp src/command.cpp)
+
+## Add cmake target dependencies of the executable
+## same as for the library above
+ add_dependencies(timonier ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+
+## Specify libraries to link a library or executable target against
+ target_link_libraries(timonier
+   ${catkin_LIBRARIES}
+ )
 
 #############
 ## Install ##
