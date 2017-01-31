@@ -153,6 +153,16 @@ include_directories(
    ${catkin_LIBRARIES}
  )
 
+ add_executable(testDeTimonier src/testDeTimonier.cpp)
+
+## Add cmake target dependencies of the executable
+## same as for the library above
+ add_dependencies(testDeTimonier ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+
+## Specify libraries to link a library or executable target against
+ target_link_libraries(testDeTimonier
+   ${catkin_LIBRARIES}
+ )
 #############
 ## Install ##
 #############
