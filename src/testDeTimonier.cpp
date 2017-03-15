@@ -52,7 +52,7 @@ int main(int argc, char **argv)
 		
     chatter_pub.publish(msg);
 
-		ros::Duration(0.2).sleep();
+		ros::Duration(4.).sleep();
 		
 		msg.vitesse = 18;
 		msg.direction = 50;
