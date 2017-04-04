@@ -8,14 +8,16 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   std_msgs
   message_generation
+  bondcpp
+  nav_msgs
 )
 
-
+include_directories(include ${bondcpp_INCLUDE_DIRS})
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
 
-
+ 
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed
 ## See http://ros.org/doc/api/catkin/html/user_guide/setup_dot_py.html
@@ -163,6 +165,16 @@ include_directories(
  target_link_libraries(testDeTimonier
    ${catkin_LIBRARIES}
  )
+ 
+ 
+add_executable(assistantTimonier src/assistantTimonier.cpp)
+add_dependencies(assistantTimonier ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(assistantTimonier ${catkin_LIBRARIES})
+
+add_executable(amiralSimple src/amiralSimple.cpp)
+add_dependencies(amiralSimple ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(amiralSimple ${catkin_LIBRARIES})
+
 #############
 ## Install ##
 #############
@@ -192,11 +204,10 @@ include_directories(
 # )
 
 ## Mark other files for installation (e.g. launch and bag files, etc.)
-# install(FILES
-#   # myfile1
-#   # myfile2
-#   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
-# )
+install(DIRECTORY launch/
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch
+  FILES_MATCHING PATTERN "*.launch"
+  PATTERN ".svn" EXCLUDE)
 
 #############
 ## Testing ##

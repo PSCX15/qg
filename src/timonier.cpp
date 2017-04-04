@@ -4,6 +4,9 @@
 #include "qg/servo_command.h"
 #include "qg/ordreAmiral.h"
 
+#include "std_msgs/String.h"
+#include "std_msgs/Bool.h"
+
 #define MILLIS 1000
 
 using std::vector;
@@ -19,11 +22,39 @@ Command* currentCommand;
 //Command* previousCommand;
 Command* askedCommand;
 Command* lastSentCommand;
-
+std::string id;
 bool isReversing;
 
+// -----------------------------------partie autorisation emergency ------------------------
+
+bool autorisation = false;
+ros::Time lastbeat;
+
+
+void heartbeat(const std_msgs::Bool::ConstPtr& msg){
+	if(msg->data){lastbeat = ros::Time::now();}
+}
+
+void testTimeOut(const ros::TimerEvent&){
+	if(ros::Time::now()-lastbeat>=ros::Duration(1.5)){
+		autorisation = false;	
+		qg::servo_command motorCommand;
+		motorCommand.device = "motor";
+		motorCommand.value= 0.0;
+		command_pub.publish(motorCommand);
+	}
+	else{
+		autorisation=true;
+	}
+}
+
+// -----------------------------------fin de cette partie -----------------------------------
+
+
+
+
 void launchCommand(const ros::TimerEvent&){
-	if(isReversing==true){return;}
+	if(isReversing==true || !autorisation){return;}
 	else{
 		qg::servo_command motorCommand;
 		motorCommand.device = "motor";
@@ -70,35 +101,37 @@ void launchCommand(const ros::TimerEvent&){
 }
 
 void reverse(){
-	qg::servo_command servoCommand;
-	
-	ROS_INFO("warning : reversing!");
-	
-	servoCommand.device = "motor";
-	
-	servoCommand.value = 0;
-  command_pub.publish(servoCommand);
-  ros::Duration(0.2).sleep();
-  servoCommand.value = -5;
-  command_pub.publish(servoCommand);
-  ros::Duration(0.1).sleep();
-  servoCommand.value = -11.45;
-  command_pub.publish(servoCommand);
-  ros::Duration(0.2).sleep();
-  servoCommand.value = -11.5;
-  command_pub.publish(servoCommand);
-  ros::Duration(0.5).sleep();
-  servoCommand.value = -11.55;
-  command_pub.publish(servoCommand);
-  ros::Duration(0.1).sleep();
-//  servoCommand.value = -25;
-//  command_pub.publish(servoCommand);
-//  ros::Duration(0.5).sleep();
-  
-  ROS_INFO("warning : reserving done !");
-  
-  lastSentCommand->value = -11.55;
-  lastSentCommand->stamp = ros::Time::now();
+	if(autorisation){
+		qg::servo_command servoCommand;
+		
+		ROS_INFO("warning : reversing!");
+		
+		servoCommand.device = "motor";
+		
+		servoCommand.value = 0;
+  	command_pub.publish(servoCommand);
+  	ros::Duration(0.2).sleep();
+  	servoCommand.value = -5;
+  	command_pub.publish(servoCommand);
+  	ros::Duration(0.1).sleep();
+  	servoCommand.value = -11.45;
+  	command_pub.publish(servoCommand);
+  	ros::Duration(0.2).sleep();
+  	servoCommand.value = -11.5;
+  	command_pub.publish(servoCommand);
+  	ros::Duration(0.5).sleep();
+  	servoCommand.value = -11.55;
+  	command_pub.publish(servoCommand);
+  	ros::Duration(0.1).sleep();
+//	  servoCommand.value = -25;
+//	  command_pub.publish(servoCommand);
+//	  ros::Duration(0.5).sleep();
+  	
+  	ROS_INFO("warning : reserving done !");
+  	
+  	lastSentCommand->value = -11.55;
+  	lastSentCommand->stamp = ros::Time::now();
+  }
 }
 
 
@@ -128,28 +161,33 @@ void enAvantToute(const qg::ordreAmiral::ConstPtr& msg)
 
 
 
-
-
 int main(int argc, char **argv)
 {
   ros::init(argc, argv, "timonier");
   ros::NodeHandle n;
 
+	//emergencyBreak on:
+  ros::Subscriber emergencyBond = n.subscribe("bondServo",100,heartbeat);
+  ros::Publisher iAmAlive = n.advertise<std_msgs::String>("servoListenerIsAlive",1000);
+  lastbeat = ros::Time::now();
+
+
+
   //déclare le publisher pour le topic servo_command
   command_pub = n.advertise<qg::servo_command>("servo_command", 1000);
   
   ros::Subscriber ordre = n.subscribe("ordreDeLAmiral", 1000, enAvantToute);
-  
   isReversing=false;
   tstart = ros::Time::now();
   lastSentCommand = new Command(tstart,0,0);
   currentCommand = new Command(tstart,0,0);
   askedCommand = new Command(tstart,0,0);
   ros::Rate loop_rate(10);
-
+	
   //lecture du tableau de paramètres
   
   ros::Timer timer = n.createTimer(ros::Duration(0.1), launchCommand);
+  ros::Timer heartbeat = n.createTimer(ros::Duration(0.1), testTimeOut);
   
   //ros::Subscriber sub = n.subscribe("servo_command", 100, interpretCommand);
   ros::spin();

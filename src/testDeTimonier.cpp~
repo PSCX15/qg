@@ -52,15 +52,6 @@ int main(int argc, char **argv)
 		
     chatter_pub.publish(msg);
 
-		ros::Duration(3.0).sleep();
-
-		msg.header.stamp = ros::Time::now();
-
-		msg.vitesse = -25;
-		msg.direction = 0;
-		
-    chatter_pub.publish(msg);
-
 		ros::Duration(0.2).sleep();
 		
 		msg.vitesse = 18;
@@ -71,6 +62,13 @@ int main(int argc, char **argv)
 		ros::Duration(3.0).sleep();
 		
 		msg.header.stamp = ros::Time::now();
+
+		msg.vitesse = 0;
+		msg.direction = 0;
+		
+    chatter_pub.publish(msg);
+    
+    msg.header.stamp = ros::Time::now();
 
 		msg.vitesse = 0;
 		msg.direction = 0;
