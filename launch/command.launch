@@ -1,0 +1,4 @@
+<launch>
+  <rosparam command="load" file="launch/command.yaml" />
+  <node name="chrono" pkg="qg" type="chrono" />
+</launch>
