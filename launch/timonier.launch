@@ -1,4 +1,4 @@
 <launch>
-  <node name="timonier" pkg="qg" type="timonier" respawn="true"/>
+  <node name="timonier" pkg="qg" type="timonier" respawn="true" output="screen"/>
   <node name="assistantTimonier" pkg="qg" type="assistantTimonier" respawn="true"/>
 </launch>

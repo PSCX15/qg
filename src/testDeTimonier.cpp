@@ -68,6 +68,8 @@ int main(int argc, char **argv)
 		
     chatter_pub.publish(msg);
     
+    ros::Duration(.5).sleep();
+    
     msg.header.stamp = ros::Time::now();
 
 		msg.vitesse = 0;
@@ -75,7 +77,7 @@ int main(int argc, char **argv)
 		
     chatter_pub.publish(msg);
 		
-		break;
+		ros::shutdown();
 
   }
 	msg.header.stamp = ros::Time::now();

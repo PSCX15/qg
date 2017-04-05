@@ -36,11 +36,14 @@ void heartbeat(const std_msgs::Bool::ConstPtr& msg){
 }
 
 void testTimeOut(const ros::TimerEvent&){
-	if(ros::Time::now()-lastbeat>=ros::Duration(1.5)){
+	if(ros::Time::now()-lastbeat>=ros::Duration(2.0)){
 		autorisation = false;	
 		qg::servo_command motorCommand;
 		motorCommand.device = "motor";
-		motorCommand.value= 0.0;
+		motorCommand.value= 1.0;
+		lastSentCommand->value = 1.0;
+		currentCommand->value = 1.0;
+		currentCommand->angle = 0.0;
 		command_pub.publish(motorCommand);
 	}
 	else{
@@ -110,16 +113,16 @@ void reverse(){
 		
 		servoCommand.value = 0;
   	command_pub.publish(servoCommand);
-  	ros::Duration(0.2).sleep();
+  	ros::Duration(0.1).sleep();
   	servoCommand.value = -5;
   	command_pub.publish(servoCommand);
   	ros::Duration(0.1).sleep();
   	servoCommand.value = -11.45;
   	command_pub.publish(servoCommand);
-  	ros::Duration(0.2).sleep();
+  	ros::Duration(0.15).sleep();
   	servoCommand.value = -11.5;
   	command_pub.publish(servoCommand);
-  	ros::Duration(0.5).sleep();
+  	ros::Duration(0.15).sleep();
   	servoCommand.value = -11.55;
   	command_pub.publish(servoCommand);
   	ros::Duration(0.1).sleep();
@@ -129,7 +132,7 @@ void reverse(){
   	
   	ROS_INFO("warning : reserving done !");
   	
-  	lastSentCommand->value = -11.55;
+  	lastSentCommand->value = -15;
   	lastSentCommand->stamp = ros::Time::now();
   }
 }
@@ -143,14 +146,15 @@ void enAvantToute(const qg::ordreAmiral::ConstPtr& msg)
 	//previousCommand = currentCommand;
 	askedCommand = new Command(msg->header.stamp, msg->vitesse , msg->direction);
 	
-	if ((lastSentCommand->value)*(askedCommand->value)>=0){
+	if ((lastSentCommand->value)*(askedCommand->value)>0){
 		currentCommand = askedCommand;
 	}
 	else{
-		if(askedCommand->value > 0){
+		if(askedCommand->value >= 0){
 			currentCommand = askedCommand;
 		}
 		else{
+			
 			isReversing=true;
 			reverse();
 			isReversing=false;
@@ -179,9 +183,9 @@ int main(int argc, char **argv)
   ros::Subscriber ordre = n.subscribe("ordreDeLAmiral", 1000, enAvantToute);
   isReversing=false;
   tstart = ros::Time::now();
-  lastSentCommand = new Command(tstart,0,0);
-  currentCommand = new Command(tstart,0,0);
-  askedCommand = new Command(tstart,0,0);
+  lastSentCommand = new Command(tstart,1,0);
+  currentCommand = new Command(tstart,1,0);
+  askedCommand = new Command(tstart,1,0);
   ros::Rate loop_rate(10);
 	
   //lecture du tableau de paramètres

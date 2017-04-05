@@ -22,7 +22,8 @@ ros::Publisher orientationRobotLocalization;
 
 float motorCommand = 0.0;
 
-float coef = 0.5;
+float coef = 0.017;
+float coef2 = 0.0084;
 std::pair<float,float> posActu;  
 std::pair<float,float> posAvant;
 tf2::Quaternion q;
@@ -40,9 +41,13 @@ void callBackVitesse(const qg::servo_command::ConstPtr& msg)
 			motorCommand = 0.0;
 			covarianceCommand = 0.0001;
 		}
-		else{
+		else if(msg->value >0.0){
 			motorCommand = coef * msg->value;
-			covarianceCommand = 0.01;
+			covarianceCommand = 0.07*0.07;
+		}
+		else {
+			motorCommand = coef2 * msg->value;
+			covarianceCommand = 0.06*0.06;
 		}
 	}
 }
@@ -65,7 +70,7 @@ void callBackOrientation(const nav_msgs::Odometry::ConstPtr& msg)
 		theta =  acos(delta_x);
 	}
 	else{
-		theta = -acos(delta_y);
+		theta = -acos(delta_x);
 	}
 	
 	if(motorCommand<0){
