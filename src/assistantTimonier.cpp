@@ -79,7 +79,7 @@ void callBackOrientation(const nav_msgs::Odometry::ConstPtr& msg)
 
 	q.setRPY(0.0,0.0,theta);
 	if(distance>0.0){
-		covarianceOrientation = 0.01/distance;
+		covarianceOrientation = 0.0005/distance;
 	}
 }
 
