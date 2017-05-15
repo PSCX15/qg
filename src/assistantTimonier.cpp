@@ -21,6 +21,7 @@ ros::Publisher commandRobotLocalization;
 ros::Publisher orientationRobotLocalization;
 
 float motorCommand = 0.0;
+float motorCommandY = 0.0;
 
 float coef = 0.017;
 float coef2 = 0.0084;
@@ -32,6 +33,7 @@ nav_msgs::Odometry msgCommand;
 nav_msgs::Odometry msgOrientation;
 
 float covarianceCommand = 0.0;
+float covarianceCommandY = 0.0;
 float covarianceOrientation = 0.0;
 
 void callBackVitesse(const qg::servo_command::ConstPtr& msg)
@@ -39,15 +41,19 @@ void callBackVitesse(const qg::servo_command::ConstPtr& msg)
 	if(msg->device=="motor"){
 		if(msg->value==0.0){
 			motorCommand = 0.0;
+			motorCommandY = 0.0;
 			covarianceCommand = 0.0001;
+			covarianceCommandY = 0.0001;
 		}
 		else if(msg->value >0.0){
 			motorCommand = coef * msg->value;
 			covarianceCommand = 0.07*0.07;
+			covarianceCommandY = 0.07*0.07;
 		}
 		else {
 			motorCommand = coef2 * msg->value;
 			covarianceCommand = 0.06*0.06;
+			covarianceCommandY = 0.06*0.06;
 		}
 	}
 }
@@ -88,7 +94,9 @@ void callBackOrientation(const nav_msgs::Odometry::ConstPtr& msg)
 void send(const ros::TimerEvent&){
 	
 	msgCommand.twist.twist.linear.x = motorCommand;
+	msgCommand.twist.twist.linear.y = motorCommandY;
 	msgCommand.twist.covariance[0]=covarianceCommand;
+	msgCommand.twist.covariance[7]=covarianceCommandY;
 	msgCommand.header.stamp = ros::Time::now();
 	
 	commandRobotLocalization.publish(msgCommand);
@@ -121,7 +129,9 @@ int main(int argc, char **argv)
 	msgCommand.header.frame_id = "odom";
 	msgCommand.child_frame_id = "base_link";
 	msgCommand.twist.twist.linear.x = motorCommand;
+	msgCommand.twist.twist.linear.y = motorCommandY;
 	msgCommand.twist.covariance[0]=covarianceCommand;
+	msgCommand.twist.covariance[7]=covarianceCommandY;
 	
 	msgOrientation.header.frame_id = "odom";
 	msgOrientation.child_frame_id = "base_link";
