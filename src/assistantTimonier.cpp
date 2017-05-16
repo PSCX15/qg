@@ -39,7 +39,7 @@ void callBackVitesse(const qg::servo_command::ConstPtr& msg)
 	if(msg->device=="motor"){
 		if(msg->value==0.0){
 			motorCommand = 0.0;
-			covarianceCommand = 0.0001;
+			covarianceCommand = 0.00001;
 		}
 		else if(msg->value >0.0){
 			motorCommand = coef * msg->value;

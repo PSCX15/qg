@@ -10,6 +10,8 @@ find_package(catkin REQUIRED COMPONENTS
   message_generation
   bondcpp
   nav_msgs
+  tf
+  #occupancy_grid_utils
 )
 
 include_directories(include ${bondcpp_INCLUDE_DIRS})
@@ -166,6 +168,14 @@ include_directories(
    ${catkin_LIBRARIES}
  )
  
+ 
+ 
+ #Titanic
+add_executable(titanic src/amiralTitanic.cpp)
+add_dependencies(titanic ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(titanic
+   ${catkin_LIBRARIES}
+ )
  
 add_executable(assistantTimonier src/assistantTimonier.cpp)
 add_dependencies(assistantTimonier ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})

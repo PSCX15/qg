@@ -190,8 +190,8 @@ int main(int argc, char **argv)
 	
   //lecture du tableau de paramètres
   
-  ros::Timer timer = n.createTimer(ros::Duration(0.1), launchCommand);
-  ros::Timer heartbeat = n.createTimer(ros::Duration(0.1), testTimeOut);
+  ros::Timer timer = n.createTimer(ros::Duration(0.2), launchCommand);
+  ros::Timer heartbeat = n.createTimer(ros::Duration(0.2), testTimeOut);
   
   //ros::Subscriber sub = n.subscribe("servo_command", 100, interpretCommand);
   ros::spin();
