@@ -40,9 +40,9 @@ void testTimeOut(const ros::TimerEvent&){
 		autorisation = false;	
 		qg::servo_command motorCommand;
 		motorCommand.device = "motor";
-		motorCommand.value= 1.0;
-		lastSentCommand->value = 1.0;
-		currentCommand->value = 1.0;
+		motorCommand.value= 0.0;
+		lastSentCommand->value = 0.0;
+		currentCommand->value = 0.0;
 		currentCommand->angle = 0.0;
 		command_pub.publish(motorCommand);
 	}
@@ -85,11 +85,19 @@ void launchCommand(const ros::TimerEvent&){
 		
 		double Dincrement = std::min((double)std::abs(Dprecedent-Dcible), 10.0);
 		
-		if(Dprecedent > Dcible){
+		if(motorCommand.value < 10 && motorCommand.value > -25){
+			directionCommand.value = Dprecedent;
+		}
+		
+		else if(Dprecedent > Dcible){
 			directionCommand.value= Dprecedent - Dincrement;
 		}
 		else{
 			directionCommand.value= Dprecedent + Dincrement;
+		}
+		
+		if(directionCommand.value == 10){
+			directionCommand.value = 9;
 		}
 		
 		command_pub.publish(motorCommand);
